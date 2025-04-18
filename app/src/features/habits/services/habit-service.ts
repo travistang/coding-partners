@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { Habit } from '../types';
+import { Habit, HabitWithCompletion } from '../types';
 
-const BASE_URL = '/api/habits';
+const BASE_URL = 'http://localhost:3000/api/habits';
 
 
 export const HabitService = {
-    async getAll(): Promise<Habit[]> {
-        const response = await axios.get<Habit[]>(BASE_URL);
+    async getAll(): Promise<HabitWithCompletion[]> {
+        const response = await axios.get<HabitWithCompletion[]>(BASE_URL);
         return response.data;
     },
 
@@ -23,4 +23,9 @@ export const HabitService = {
     async delete(id: string): Promise<void> {
         await axios.delete(`${BASE_URL}/${id}`);
     },
+
+    async toggleComplete(id: string): Promise<Habit> {
+        const response = await axios.patch<Habit>(`${BASE_URL}/${id}/toggle`);
+        return response.data;
+    }
 };

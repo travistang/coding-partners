@@ -3,3 +3,9 @@ export type Habit = {
     name: string;
     description?: string;
 }
+
+export type CreateHabit = Omit<Habit, "id">;
+
+export type HabitWithCompletion = Habit & {
+    completed: boolean;
+}
