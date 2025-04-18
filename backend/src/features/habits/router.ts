@@ -1,31 +1,21 @@
 import express from 'express';
-import { InMemoryHabitRepository } from './repository/in-memory-habit-repository';
+import { FileHabitRepository } from './repository/file-habit-repository';
 
 const router = express.Router();
-const habitRepository = new InMemoryHabitRepository();
+const habitRepository = new FileHabitRepository();
 
-router.get('/', (req, res) => {
-    const habits = habitRepository.getAll();
+router.get('/', async (req, res) => {
+    const habits = await habitRepository.getAll();
     res.json(habits);
 });
 
-router.get('/:id', (req, res) => {
-    const habits = habitRepository.getAll();
-    const habit = habits.find(h => h.id === req.params.id);
-    if (!habit) {
-        res.status(404).json({ message: 'Habit not found' });
-        return;
-    }
-    res.json(habit);
-});
-
-router.post('/', (req, res) => {
-    const habit = habitRepository.create(req.body);
+router.post('/', async (req, res) => {
+    const habit = await habitRepository.create(req.body);
     res.status(201).json(habit);
 });
 
-router.delete('/:id', (req, res) => {
-    const deleted = habitRepository.delete(req.params.id);
+router.delete('/:id', async (req, res) => {
+    const deleted = await habitRepository.delete(req.params.id);
     if (!deleted) {
         res.status(404).json({ message: 'Habit not found' });
         return;
@@ -33,8 +23,8 @@ router.delete('/:id', (req, res) => {
     res.status(204).send();
 });
 
-router.patch('/:id/toggle', (req, res) => {
-    const result = habitRepository.toggleCompleteForToday(req.params.id);
+router.patch('/:id/toggle', async (req, res) => {
+    const result = await habitRepository.toggleCompleteForToday(req.params.id);
     if (!result) {
         res.status(404).json({ message: 'Habit not found' });
         return;
