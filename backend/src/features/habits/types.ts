@@ -4,3 +4,6 @@ export type Habit = {
     description?: string;
 };
 
+export type HabitWithCompletion = Habit & {
+    completed: boolean;
+}
