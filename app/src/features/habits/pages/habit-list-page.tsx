@@ -36,16 +36,28 @@ const HabitListPage: React.FC = () => {
       console.error("Failed to toggle habit completion:", error);
     },
   });
+
+  const { mutate: deleteHabit } = useMutation({
+    mutationFn: HabitService.delete,
+    onSuccess: () => {
+      refetch();
+    },
+    onError: (error: unknown) => {
+      console.error("Failed to delete habit:", error);
+    },
+  });
+
   return (
     <div>
       <div className="h-16 shrink-0 sticky top-0 flex items-center justify-between p-4">
-        <span className="text-lg font-semibold">Habit List</span>
+        <span className="text-lg font-semibold">All habits</span>
         <button onClick={() => setShowModal(true)} className="primary">
           Create habit
         </button>
       </div>
       <HabitList
-        onToggle={toggleHabitCompletion}
+        onDelete={(habitId) => deleteHabit(habitId)}
+        onToggle={(habitId) => toggleHabitCompletion(habitId)}
         habits={habits}
         loading={isLoading}
         errored={isError}
