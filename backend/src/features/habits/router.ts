@@ -12,7 +12,12 @@ const habitCompletions: Record<string, string[]> = {};
 const router = express.Router();
 
 router.get('/', (req, res) => {
-    res.json(habits);
+    const today = format(Date.now(), 'dd/MM/yyyy');
+    const habitsWithCompletionStatus = habits.map(habit => ({
+        ...habit,
+        completed: habitCompletions[today]?.includes(habit.id) || false
+    }));
+    res.json(habitsWithCompletionStatus);
 });
 
 router.get('/:id', (req, res) => {
