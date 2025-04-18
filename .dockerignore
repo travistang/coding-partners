@@ -1,0 +1,6 @@
+.vercel
+.github
+node_modules
+dist
+public
+.env
