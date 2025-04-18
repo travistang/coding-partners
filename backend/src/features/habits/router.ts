@@ -1,8 +1,11 @@
 import express from 'express';
 import { FileHabitRepository } from './repository/file-habit-repository';
+import { InMemoryHabitRepository } from './repository/in-memory-habit-repository';
 
 const router = express.Router();
-const habitRepository = new FileHabitRepository();
+const habitRepository = process.env.USE_FILE_REPOSITORY
+    ? new FileHabitRepository()
+    : new InMemoryHabitRepository();
 
 router.get('/', async (req, res) => {
     const habits = await habitRepository.getAll();
