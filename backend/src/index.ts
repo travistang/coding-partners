@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import habitsRouter from './features/habits/router';
 
@@ -6,6 +7,8 @@ const port = 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
+app.use(cors());
+
 app.use('/api/habits', habitsRouter);
 // Start the server
 app.listen(port, () => {

@@ -58,7 +58,7 @@ router.delete('/:id', (req, res) => {
     res.status(204).send();
 });
 
-router.post('/:id/toggle', (req, res) => {
+router.patch('/:id/toggle', (req, res) => {
 
     const index = habits.findIndex(h => h.id === req.params.id);
     if (index === -1) {
