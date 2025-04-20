@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { Habit, HabitWithCompletion } from '../types';
+import { Habit, HabitWithInsights } from '../types';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api/habits';
 
 
 export const HabitService = {
-    async getAll(): Promise<HabitWithCompletion[]> {
-        const response = await axios.get<HabitWithCompletion[]>(BASE_URL);
+    async getAll(): Promise<HabitWithInsights[]> {
+        const response = await axios.get<HabitWithInsights[]>(BASE_URL);
         return response.data;
     },
 

@@ -1,8 +1,8 @@
-import { HabitWithCompletion } from "../types";
+import { HabitWithInsights } from "../types";
 import { HabitItem } from "./habit-item";
 
 type Props = {
-  habits: HabitWithCompletion[];
+  habits: HabitWithInsights[];
   loading?: boolean;
   errored?: boolean;
   onToggle: (id: string) => void;

@@ -32,22 +32,22 @@ export class FileHabitRepository extends InMemoryHabitRepository {
         }
     }
 
-    protected async loadData() {
+    private async loadData() {
         this.habits = await this.readFile(this.fileNames['habit'], []);
         this.habitCompletions = await this.readFile(this.fileNames['habit-completions'], {});
     }
 
-    protected writeFile(fileName: string, data: any) {
-        return writeFile(
+    private writeFile(fileName: string, data: any) {
+        writeFile(
             path.join(this.dataPath, fileName),
             data
         );
     }
 
-    protected async readFile(fileName: string, defaultContent: any) {
+    private async readFile(fileName: string, defaultContent: any) {
         return loadFile(path.join(this.dataPath, fileName), defaultContent);
     }
-    protected async saveData() {
+    private async saveData() {
         await Promise.all([
             this.writeFile(this.fileNames['habit'], this.habits),
             this.writeFile(this.fileNames['habit-completions'], this.habitCompletions)
