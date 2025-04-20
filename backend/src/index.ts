@@ -1,26 +1,33 @@
 import cors from 'cors';
 import express from 'express';
 import path from 'path';
-import habitsRouter from './features/habits/router';
+import { createHabitsRouter } from './features/habits/router';
 
-const app = express();
 const port = 3000;
 
-// Middleware to parse JSON
-app.use(express.json());
-app.use(cors());
+const createApp = async () => {
+    const habitsRouter = await createHabitsRouter();
 
-app.use('/api/habits', habitsRouter);
+    const app = express();
+    app.use(express.json());
+    app.use(cors());
 
-// Serve static files from the public directory
-app.use(express.static(path.join(__dirname, '../public')));
+    app.use('/api/habits', habitsRouter);
 
-// Serve index.html for all other routes (SPA support)
-app.get(/(.*)/, (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-});
+    // Serve static files from the public directory
+    app.use(express.static(path.join(__dirname, '../public')));
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on ${port}`);
+    // Serve index.html for all other routes (SPA support)
+    app.get(/(.*)/, (req, res) => {
+        res.sendFile(path.join(__dirname, '../public/index.html'));
+    });
+
+    return app;
+}
+
+createApp().then((app) => {
+    // Start the server
+    app.listen(port, () => {
+        console.log(`Server is running on ${port}`);
+    });
 });

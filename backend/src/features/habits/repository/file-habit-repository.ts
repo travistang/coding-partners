@@ -1,18 +1,29 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { loadFile } from '../helpers/load-file';
+import { writeFile } from '../helpers/write-file';
 import { Habit, HabitWithCompletion } from "../types";
 import { InMemoryHabitRepository } from './in-memory-habit-repository';
 
+type PersistentDataType = 'habit' | 'habit-completions';
 export class FileHabitRepository extends InMemoryHabitRepository {
-    private readonly dataPath: string;
-
-    constructor() {
-        super();
-        this.dataPath = path.join(__dirname, '../../../data');
-        this.initialize();
+    private readonly dataPath = path.join(__dirname, '../../../data');
+    private readonly fileNames: Record<PersistentDataType, string> = {
+        habit: 'habits.json',
+        "habit-completions": 'completions.json'
     }
 
-    private async initialize() {
+    private constructor() {
+        super();
+    }
+
+    static async create(): Promise<FileHabitRepository> {
+        const instance = new FileHabitRepository();
+        await instance.initialize();
+        return instance;
+    }
+
+    async initialize() {
         try {
             await fs.mkdir(this.dataPath, { recursive: true });
             await this.loadData();
@@ -21,37 +32,30 @@ export class FileHabitRepository extends InMemoryHabitRepository {
         }
     }
 
-    private async loadData() {
-        try {
-            const [habitsData, completionsData] = await Promise.all([
-                fs.readFile(path.join(this.dataPath, 'habits.json'), 'utf-8'),
-                fs.readFile(path.join(this.dataPath, 'completions.json'), 'utf-8')
-            ]);
-            this.habits = JSON.parse(habitsData);
-            this.habitCompletions = JSON.parse(completionsData);
-        } catch (error) {
-            // Initialize with empty data if files don't exist
-            this.habits = [];
-            this.habitCompletions = {};
-        }
+    protected async loadData() {
+        this.habits = await this.readFile(this.fileNames['habit'], []);
+        this.habitCompletions = await this.readFile(this.fileNames['habit-completions'], {});
     }
 
-    private async saveData() {
+    protected writeFile(fileName: string, data: any) {
+        return writeFile(
+            path.join(this.dataPath, fileName),
+            data
+        );
+    }
+
+    protected async readFile(fileName: string, defaultContent: any) {
+        return loadFile(path.join(this.dataPath, fileName), defaultContent);
+    }
+    protected async saveData() {
         await Promise.all([
-            fs.writeFile(
-                path.join(this.dataPath, 'habits.json'),
-                JSON.stringify(this.habits, null, 2)
-            ),
-            fs.writeFile(
-                path.join(this.dataPath, 'completions.json'),
-                JSON.stringify(this.habitCompletions, null, 2)
-            )
+            this.writeFile(this.fileNames['habit'], this.habits),
+            this.writeFile(this.fileNames['habit-completions'], this.habitCompletions)
         ]);
     }
 
     async getAll(): Promise<HabitWithCompletion[]> {
         const result = await super.getAll();
-        await this.saveData();
         return result;
     }
 

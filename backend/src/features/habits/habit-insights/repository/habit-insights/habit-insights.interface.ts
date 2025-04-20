@@ -1,6 +1,6 @@
-import { HabitRepository } from "../../../repository/habit-repository.interface";
-import { HabitWithInsights } from "../../types";
+import { HabitInsights } from "../../types";
 
-export interface HabitInsightsRepository extends HabitRepository {
-    getAll(): Promise<HabitWithInsights[]>;
+export interface HabitInsightsRepository {
+    load(): Promise<Record<string, HabitInsights>>;
+    save(insights: Record<string, HabitInsights>): Promise<void>;
 }

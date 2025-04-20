@@ -61,4 +61,8 @@ export class InMemoryHabitRepository implements HabitRepository {
             completed: this.habitCompletions[today].includes(id)
         };
     }
+
+    async getHabitCompletions(): Promise<Record<string, string[]>> {
+        return this.habitCompletions;
+    }
 }
