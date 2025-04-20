@@ -8,6 +8,11 @@
     "build:frontend": "cd ../app && npm run build && cp -r dist ../backend/public",
     "dev": "nodemon --exec ts-node src/index.ts"
   },
+  "nodemonConfig": {
+    "ignore": [
+      "src/data/*"
+    ]
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

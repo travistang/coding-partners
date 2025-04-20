@@ -1,15 +1,13 @@
-import { format } from 'date-fns';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { Habit, HabitWithCompletion } from "../types";
-import { HabitRepository } from "./habit-repository.interface";
+import { InMemoryHabitRepository } from './in-memory-habit-repository';
 
-export class FileHabitRepository implements HabitRepository {
+export class FileHabitRepository extends InMemoryHabitRepository {
     private readonly dataPath: string;
-    private habits: Habit[] = [];
-    private habitCompletions: Record<string, string[]> = {};
 
     constructor() {
+        super();
         this.dataPath = path.join(__dirname, '../../../data');
         this.initialize();
     }
@@ -20,9 +18,6 @@ export class FileHabitRepository implements HabitRepository {
             await this.loadData();
         } catch (error) {
             console.error('Failed to initialize repository:', error);
-            // Initialize with empty data if files don't exist
-            this.habits = [];
-            this.habitCompletions = {};
         }
     }
 
@@ -55,64 +50,26 @@ export class FileHabitRepository implements HabitRepository {
     }
 
     async getAll(): Promise<HabitWithCompletion[]> {
-        await this.loadData();
-        const today = format(Date.now(), 'dd/MM/yyyy');
-        return this.habits.map(habit => ({
-            ...habit,
-            completed: this.habitCompletions[today]?.includes(habit.id) || false
-        }));
+        const result = await super.getAll();
+        await this.saveData();
+        return result;
     }
 
     async create(habit: Omit<Habit, "id">): Promise<Habit> {
-        await this.loadData();
-        const newHabit: Habit = {
-            id: crypto.randomUUID(),
-            ...habit
-        };
-        this.habits.push(newHabit);
+        const newHabit = await super.create(habit);
         await this.saveData();
         return newHabit;
     }
 
     async delete(id: string): Promise<boolean> {
-        await this.loadData();
-        const initialLength = this.habits.length;
-        this.habits = this.habits.filter(habit => habit.id !== id);
-
-        // Clean up completions
-        Object.keys(this.habitCompletions).forEach(date => {
-            this.habitCompletions[date] = this.habitCompletions[date].filter(
-                habitId => habitId !== id
-            );
-        });
-
+        const result = await super.delete(id);
         await this.saveData();
-        return this.habits.length !== initialLength;
+        return result;
     }
 
     async toggleCompleteForToday(id: string): Promise<{ date: string; habit: Habit; completed: boolean } | null> {
-        await this.loadData();
-        const habit = this.habits.find(h => h.id === id);
-        if (!habit) return null;
-
-        const today = format(Date.now(), 'dd/MM/yyyy');
-        if (!this.habitCompletions[today]) {
-            this.habitCompletions[today] = [];
-        }
-
-        if (this.habitCompletions[today].includes(id)) {
-            this.habitCompletions[today] = this.habitCompletions[today].filter(
-                habitId => habitId !== id
-            );
-        } else {
-            this.habitCompletions[today].push(id);
-        }
-
+        const result = await super.toggleCompleteForToday(id);
         await this.saveData();
-        return {
-            date: today,
-            habit,
-            completed: this.habitCompletions[today].includes(id)
-        };
+        return result;
     }
 }

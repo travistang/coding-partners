@@ -1,14 +1,14 @@
-import { format } from 'date-fns';
+import { stringifyDate } from '../helpers/stringify-date';
 import { Habit, HabitWithCompletion } from "../types";
 import { HabitRepository } from "./habit-repository.interface";
 
 export class InMemoryHabitRepository implements HabitRepository {
     // In-memory storage
-    private habits: Habit[] = [];
-    private habitCompletions: Record<string, string[]> = {};
+    protected habits: Habit[] = [];
+    protected habitCompletions: Record<string, string[]> = {};
 
     async getAll(): Promise<HabitWithCompletion[]> {
-        const today = format(Date.now(), 'dd/MM/yyyy');
+        const today = stringifyDate(Date.now());
         return this.habits.map(habit => ({
             ...habit,
             completed: this.habitCompletions[today]?.includes(habit.id) || false
@@ -42,7 +42,7 @@ export class InMemoryHabitRepository implements HabitRepository {
         const habit = this.habits.find(h => h.id === id);
         if (!habit) return null;
 
-        const today = format(Date.now(), 'dd/MM/yyyy');
+        const today = stringifyDate(Date.now());
         if (!this.habitCompletions[today]) {
             this.habitCompletions[today] = [];
         }
