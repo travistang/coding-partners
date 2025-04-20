@@ -6,7 +6,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm install
+RUN npm ci && npm run build
 
 # Build both frontend and backend
 RUN npm run build
