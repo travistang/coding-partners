@@ -1,6 +1,7 @@
 .vercel
 .github
-node_modules
+node_modules/
 dist
 public
 .env
+package-lock.json

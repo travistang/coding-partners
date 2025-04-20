@@ -1,24 +1,18 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-COPY app/package*.json ./app/
-COPY backend/package*.json ./backend/
+COPY . .
 
 # Install dependencies
 RUN npm ci
-
-# Copy source code
-COPY . .
 
 # Build both frontend and backend
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -30,7 +24,7 @@ COPY --from=builder /app/backend/public ./backend/public
 
 # Install production dependencies only
 ENV NODE_ENV=production
-RUN npm ci --only=production --workspace=backend
+RUN npm install --workspace=backend
 
 # Set environment variables
 ENV PORT=3000
